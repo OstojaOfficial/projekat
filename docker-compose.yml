@@ -1,17 +1,17 @@
-version: '3.8'
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: postgres-db
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb-db
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MYSQL_DATABASE: ${MARIADB_DATABASE}
+      MYSQL_USER: ${MARIADB_USER}
+      MYSQL_PASSWORD: ${MARIADB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mariadb_data:/var/lib/mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
   
   backend:
     image: backend-app
@@ -20,11 +20,11 @@ services:
       context: ./backend
     restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/${MARIADB_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MARIADB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MARIADB_PASSWORD}
     depends_on:
-      - postgres
+      - mariadb
     ports:
       - "8080:8080"
   
@@ -40,4 +40,4 @@ services:
       - backend
 
 volumes:
-  postgres_data:
+  mariadb_data:
